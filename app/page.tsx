@@ -48,52 +48,52 @@ const createHighlightedSpan = ({
 
 export default function Page() {
   const [isLoading, setIsLoading] = useState(false);
-  // const [people, setPeople] = useState<{
-  //   [key: string]: string[];
-  // }>({});
+  const [people, setPeople] = useState<{
+    [key: string]: string[];
+  }>({});
 
   // TODO: delete mock data
-  const people: {
-    [key: string]: string[];
-  } = {
-    employee: [
-      "John - john.smith@email.com",
-      "Sarah - sarah.jones@email.com",
-      "Adam - adam.smith@email.com",
-      "Kelly - kelly.brown@email.com",
-      "Emily - emily.wilson@email.com",
-      "Ryan - ryan.mcginnis@email.com",
-      "Stephanie - stephanie.brown@email.com",
-      "Tom - tom.thompson@email.com",
-      "Bill - bill.dunlap@email.com",
-      "Karen - karen.brown@email.com",
-      "Tony - anthony.sanchez@email.com",
-      "John - john.doe@email.com",
-      "Sarah - sarah.jones@email.com",
-      "Adam - adam.smith@email.com",
-    ],
-    customer: [
-      "Kelly - kelly.brown@email.com",
-      "Emily - emily.wilson@email.com",
-      "Ryan - ryan.mcginnis@email.com",
-      "Stephanie - stephanie.brown@email.com",
-      "Tom - tom.thompson@email.com",
-      "Bill - bill.dunlap@email.com",
-      "Karen - karen.brown@email.com",
-      "Tony - anthony.sanchez@email.com",
-      "John - john.doe@email.com",
-      "Sarah - sarah.jones@email.com",
-      "Adam - adam.smith@email.com",
-    ],
-  };
+  // const people: {
+  //   [key: string]: string[];
+  // } = {
+  //   employee: [
+  //     "John - john.smith@email.com",
+  //     "Sarah - sarah.jones@email.com",
+  //     "Adam - adam.smith@email.com",
+  //     "Kelly - kelly.brown@email.com",
+  //     "Emily - emily.wilson@email.com",
+  //     "Ryan - ryan.mcginnis@email.com",
+  //     "Stephanie - stephanie.brown@email.com",
+  //     "Tom - tom.thompson@email.com",
+  //     "Bill - bill.dunlap@email.com",
+  //     "Karen - karen.brown@email.com",
+  //     "Tony - anthony.sanchez@email.com",
+  //     "John - john.doe@email.com",
+  //     "Sarah - sarah.jones@email.com",
+  //     "Adam - adam.smith@email.com",
+  //   ],
+  //   customer: [
+  //     "Kelly - kelly.brown@email.com",
+  //     "Emily - emily.wilson@email.com",
+  //     "Ryan - ryan.mcginnis@email.com",
+  //     "Stephanie - stephanie.brown@email.com",
+  //     "Tom - tom.thompson@email.com",
+  //     "Bill - bill.dunlap@email.com",
+  //     "Karen - karen.brown@email.com",
+  //     "Tony - anthony.sanchez@email.com",
+  //     "John - john.doe@email.com",
+  //     "Sarah - sarah.jones@email.com",
+  //     "Adam - adam.smith@email.com",
+  //   ],
+  // };
 
   const handleClick = async () => {
     setIsLoading(true);
-    // setPeople({});
+    setPeople({});
 
-    // const res = await fetchGenerateNameEmail();
+    const res = await fetchGenerateNameEmail();
 
-    // setPeople(res.success);
+    setPeople(res.success);
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
@@ -139,8 +139,8 @@ export default function Page() {
           <p>Please wait...</p>
         </div>
       )}
-      {people && (
-        <div className="bg-white rounded-lg p-2 mt-3">
+      {Object.keys(people).length > 0 && (
+        <div className="bg-white rounded-lg p-2 mt-3 max-h-[300px] overflow-auto">
           {Object.keys(people).map((key) =>
             people[key].map((person: string, index: number) => (
               <p key={index}>
@@ -168,7 +168,7 @@ export default function Page() {
             const contentEditableElement =
               document.querySelector<HTMLDivElement>("#content_editable")!;
 
-            const name = "@" + nameEmail.split(" ")[0].trim();
+            const name = "@" + nameEmail.split("-")[0].trim();
 
             contentEditableElement.innerHTML =
               contentEditableElement.innerHTML.substring(

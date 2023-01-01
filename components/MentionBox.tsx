@@ -26,7 +26,7 @@ export default function MentionBox({
         left: coord.left,
       }}
     >
-      {Object.keys(people).map((key, index) =>
+      {Object.keys(people).map((key) =>
         people[key].map((person: string, index: number) => (
           <div
             key={index}
