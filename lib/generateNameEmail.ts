@@ -10,7 +10,7 @@ export default async function generateNameEmail() {
 
     const prompt = "Generate 25 names with emails. Eg: fullname - email";
     const response = await openai.createCompletion({
-      model: "text-curie-001",
+      model: "text-davinci-002",
       prompt,
       n: 1,
       max_tokens: 400,
