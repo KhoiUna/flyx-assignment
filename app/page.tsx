@@ -3,7 +3,7 @@
 import axios from "axios";
 import { useState } from "react";
 import MentionBox from "../components/MentionBox";
-import { SyntheticEvent, useRef, ReactNode } from "react";
+import { useRef } from "react";
 
 const moveCursorToEndContenteditable = (
   contentEditableElement: HTMLDivElement
@@ -105,23 +105,19 @@ export default function Page() {
   });
 
   const [mentioned, setMentioned] = useState(false);
-  const handleInput = (event: SyntheticEvent) => {
+  const handleInput = (event: KeyboardEvent) => {
     const contentEditableElement = event.target as HTMLDivElement;
 
     const tempEl = document.createElement("div");
     tempEl.innerHTML = contentEditableElement.innerHTML;
 
-    if (
-      contentEditableElement.innerText[
-        contentEditableElement.innerText.length - 1
-      ] === "@"
-    ) {
+    if (event.key === "@") {
       mentionBoxCoord.current.left = contentEditableElement.offsetLeft + 400;
       mentionBoxCoord.current.top = contentEditableElement.offsetTop;
       return setMentioned(true);
     }
 
-    return setMentioned(false);
+    if (event.key !== "Shift") return setMentioned(false);
   };
 
   return (
@@ -156,7 +152,7 @@ export default function Page() {
         <div
           id="content_editable"
           contentEditable={true}
-          onInput={handleInput}
+          onKeyUp={handleInput as any}
           className="border-black border-2 p-3 m-auto mt-2 rounded-lg bg-white w-full max-w-[400px] h-[500px] text-left"
         ></div>
 
