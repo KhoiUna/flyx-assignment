@@ -122,6 +122,10 @@ export default function Page() {
 
   return (
     <div className="text-center p-5 bg-slate-50 min-h-screen">
+      <h1 className="text-lg font-bold text-center mb-3">
+        1. Hit Generate to have OpenAI-generated names
+      </h1>
+
       <button
         className="bg-white p-2 rounded-lg shadow-lg"
         onClick={handleClick}
@@ -148,7 +152,7 @@ export default function Page() {
       )}
 
       <div className="mt-8">
-        <h1 className="text-lg font-bold text-center">Type @ to mention</h1>
+        <h1 className="text-lg font-bold text-center">2. Type @ to mention</h1>
         <div
           id="content_editable"
           contentEditable={true}
