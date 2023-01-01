@@ -19,7 +19,7 @@ export default async function generateNameEmail() {
 
     return response.data.choices[0].text;
   } catch (error) {
-    console.error("Error generating names and emails");
+    console.error("Error generating names and emails", error);
     return;
   }
 }

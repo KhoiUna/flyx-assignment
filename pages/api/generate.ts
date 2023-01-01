@@ -12,13 +12,20 @@ export default async function generate(
   res: NextApiResponse<ApiResponse>
 ) {
   try {
+    // TODO: fix
     const text = await generateNameEmail();
+    console.log(text);
+
     const peopleArray = formatData(text as string);
 
-    // TODO slice array and save to Elastic as `employees` or `customers`
-    //
+    const people = peopleArray.slice(0, 25);
+    const customers = people.slice(0, 11);
+    const employees = people.slice(11, 24);
 
-    return res.json({ success: peopleArray.slice(0, 25), error: false });
+    return res.json({
+      success: { employee: employees, customer: customers },
+      error: false,
+    });
   } catch (error) {
     console.error("Error in /generate", error);
     return res.status(500).json({ success: false, error: true });
