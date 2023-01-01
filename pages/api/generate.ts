@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { formatData } from "../../helpers/helpers";
 import generateNameEmail from "../../lib/generateNameEmail";
+import saveToElastic from "../../lib/saveToElastic";
 
 type ApiResponse = {
   success: any;
@@ -12,15 +13,24 @@ export default async function generate(
   res: NextApiResponse<ApiResponse>
 ) {
   try {
-    // TODO: fix
     const text = await generateNameEmail();
-    console.log(text);
 
     const peopleArray = formatData(text as string);
 
     const people = peopleArray.slice(0, 25);
-    const customers = people.slice(0, 11);
-    const employees = people.slice(11, 24);
+    const customers = people.slice(0, 12);
+    const employees = people.slice(12, 25);
+
+    if (
+      !(
+        (await saveToElastic("customer", customers)) &&
+        (await saveToElastic("employee", employees))
+      )
+    )
+      return res.json({
+        success: false,
+        error: true,
+      });
 
     return res.json({
       success: { employee: employees, customer: customers },
