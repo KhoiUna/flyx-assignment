@@ -34,10 +34,25 @@ const fetchGenerateNameEmail = async () => {
   return data;
 };
 
+const createHighlightedSpan = ({
+  type,
+  name,
+}: {
+  type: string;
+  name: string;
+}) => {
+  if (type === "employee") return `<span class="bg-red-300">${name}</span>`;
+
+  return `<span class="bg-blue-300">${name}</span>`;
+};
+
 export default function Page() {
   const [isLoading, setIsLoading] = useState(false);
-  // const [people, setPeople] = useState([]);
+  // const [people, setPeople] = useState<{
+  //   [key: string]: string[];
+  // }>({});
 
+  // TODO: delete mock data
   const people: {
     [key: string]: string[];
   } = {
@@ -74,7 +89,7 @@ export default function Page() {
 
   const handleClick = async () => {
     setIsLoading(true);
-    // setPeople([]);
+    // setPeople({});
 
     // const res = await fetchGenerateNameEmail();
 
@@ -89,18 +104,20 @@ export default function Page() {
     left: 0,
   });
 
-  const [content, setContent] = useState<string | ReactNode>("");
   const [mentioned, setMentioned] = useState(false);
   const handleInput = (event: SyntheticEvent) => {
-    const contentEditable = event.target as HTMLDivElement;
-    const userInput = contentEditable.innerText;
+    const contentEditableElement = event.target as HTMLDivElement;
 
-    setContent(userInput);
-    moveCursorToEndContenteditable(contentEditable);
+    const tempEl = document.createElement("div");
+    tempEl.innerHTML = contentEditableElement.innerHTML;
 
-    if (userInput[userInput.length - 1] === "@") {
-      mentionBoxCoord.current.left = contentEditable.offsetLeft + 400;
-      mentionBoxCoord.current.top = contentEditable.offsetTop;
+    if (
+      contentEditableElement.innerText[
+        contentEditableElement.innerText.length - 1
+      ] === "@"
+    ) {
+      mentionBoxCoord.current.left = contentEditableElement.offsetLeft + 400;
+      mentionBoxCoord.current.top = contentEditableElement.offsetTop;
       return setMentioned(true);
     }
 
@@ -123,7 +140,7 @@ export default function Page() {
         </div>
       )}
       {people && (
-        <div className="bg-white rounded-lg p-2 mt-3 hidden">
+        <div className="bg-white rounded-lg p-2 mt-3">
           {Object.keys(people).map((key) =>
             people[key].map((person: string, index: number) => (
               <p key={index}>
@@ -134,27 +151,41 @@ export default function Page() {
         </div>
       )}
 
-      <div className="mt-6">
+      <div className="mt-8">
+        <h1 className="text-lg font-bold text-center">Type @ to mention</h1>
         <div
           id="content_editable"
           contentEditable={true}
           onInput={handleInput}
-          className="border-black border-2 p-3 m-auto mt-2 rounded-lg bg-white w-[400px] h-[500px] text-left"
-        >
-          {content}
-        </div>
+          className="border-black border-2 p-3 m-auto mt-2 rounded-lg bg-white w-full max-w-[400px] h-[500px] text-left"
+        ></div>
 
         <MentionBox
           coord={mentionBoxCoord.current}
           people={people}
           opened={mentioned}
-          toggle={() => {
-            setMentioned(false);
+          handleClick={(type: string, nameEmail: string) => {
             const contentEditableElement =
               document.querySelector<HTMLDivElement>("#content_editable")!;
 
+            const name = "@" + nameEmail.split(" ")[0].trim();
+
+            contentEditableElement.innerHTML =
+              contentEditableElement.innerHTML.substring(
+                0,
+                contentEditableElement.innerHTML.length - 1
+              );
+
+            contentEditableElement.innerHTML +=
+              createHighlightedSpan({
+                type,
+                name,
+              }) + "&nbsp";
+
             contentEditableElement!.focus();
             moveCursorToEndContenteditable(contentEditableElement);
+
+            return setMentioned(false);
           }}
         />
       </div>

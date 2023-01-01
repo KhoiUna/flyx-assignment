@@ -4,15 +4,18 @@ type Props = {
     left: number;
   };
   people: {
-    // employee: string[];
-    // customer: string[];
     [key: string]: string[];
   };
   opened: boolean;
-  toggle: () => void;
+  handleClick: (type: string, nameEmail: string) => void;
 };
 
-export default function MentionBox({ coord, people, opened, toggle }: Props) {
+export default function MentionBox({
+  coord,
+  people,
+  opened,
+  handleClick,
+}: Props) {
   if (!opened) return <></>;
 
   return (
@@ -28,7 +31,7 @@ export default function MentionBox({ coord, people, opened, toggle }: Props) {
           <div
             key={index}
             className="p-1 hover:bg-orange-50 border-2 border-slate-200 cursor-pointer text-left"
-            onClick={toggle}
+            onClick={() => handleClick(key, person)}
           >
             <p
               className="overflow-ellipsis"
