@@ -3,7 +3,31 @@
 import axios from "axios";
 import { useState } from "react";
 import MentionBox from "../components/MentionBox";
-import { SyntheticEvent, useRef } from "react";
+import { SyntheticEvent, useRef, ReactNode } from "react";
+
+const moveCursorToEndContenteditable = (
+  contentEditableElement: HTMLDivElement
+) => {
+  if (document.createRange) {
+    // Create a range (a range is a like the selection but invisible)
+    const range = document.createRange();
+
+    // Select the entire contents of the element with the range
+    range.selectNodeContents(contentEditableElement);
+
+    // Collapse the range to the end point. false means collapse to end rather than the start
+    range.collapse(false);
+
+    // Get the selection object (allows you to change selection)
+    const selection = window.getSelection();
+
+    // Remove any selections already made
+    selection!.removeAllRanges();
+
+    // Make the range you have just created the visible selection
+    selection!.addRange(range);
+  }
+};
 
 const fetchGenerateNameEmail = async () => {
   const { data } = await axios.get("/api/generate");
@@ -13,42 +37,51 @@ const fetchGenerateNameEmail = async () => {
 export default function Page() {
   const [isLoading, setIsLoading] = useState(false);
   // const [people, setPeople] = useState([]);
-  const people = [
-    "John - john.smith@email.com",
-    "Sarah - sarah.jones@email.com",
-    "Adam - adam.smith@email.com",
-    "Kelly - kelly.brown@email.com",
-    "Emily - emily.wilson@email.com",
-    "Ryan - ryan.mcginnis@email.com",
-    "Stephanie - stephanie.brown@email.com",
-    "Tom - tom.thompson@email.com",
-    "Bill - bill.dunlap@email.com",
-    "Karen - karen.brown@email.com",
-    "Tony - anthony.sanchez@email.com",
-    "John - john.doe@email.com",
-    "Sarah - sarah.jones@email.com",
-    "Adam - adam.smith@email.com",
-    "Kelly - kelly.brown@email.com",
-    "Emily - emily.wilson@email.com",
-    "Ryan - ryan.mcginnis@email.com",
-    "Stephanie - stephanie.brown@email.com",
-    "Tom - tom.thompson@email.com",
-    "Bill - bill.dunlap@email.com",
-    "Karen - karen.brown@email.com",
-    "Tony - anthony.sanchez@email.com",
-    "John - john.doe@email.com",
-    "Sarah - sarah.jones@email.com",
-    "Adam - adam.smith@email.com",
-  ];
+
+  const people: {
+    [key: string]: string[];
+  } = {
+    employee: [
+      "John - john.smith@email.com",
+      "Sarah - sarah.jones@email.com",
+      "Adam - adam.smith@email.com",
+      "Kelly - kelly.brown@email.com",
+      "Emily - emily.wilson@email.com",
+      "Ryan - ryan.mcginnis@email.com",
+      "Stephanie - stephanie.brown@email.com",
+      "Tom - tom.thompson@email.com",
+      "Bill - bill.dunlap@email.com",
+      "Karen - karen.brown@email.com",
+      "Tony - anthony.sanchez@email.com",
+      "John - john.doe@email.com",
+      "Sarah - sarah.jones@email.com",
+      "Adam - adam.smith@email.com",
+    ],
+    customer: [
+      "Kelly - kelly.brown@email.com",
+      "Emily - emily.wilson@email.com",
+      "Ryan - ryan.mcginnis@email.com",
+      "Stephanie - stephanie.brown@email.com",
+      "Tom - tom.thompson@email.com",
+      "Bill - bill.dunlap@email.com",
+      "Karen - karen.brown@email.com",
+      "Tony - anthony.sanchez@email.com",
+      "John - john.doe@email.com",
+      "Sarah - sarah.jones@email.com",
+      "Adam - adam.smith@email.com",
+    ],
+  };
 
   const handleClick = async () => {
     setIsLoading(true);
     // setPeople([]);
 
-    const res = await fetchGenerateNameEmail();
+    // const res = await fetchGenerateNameEmail();
 
     // setPeople(res.success);
-    setIsLoading(false);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
   };
 
   const mentionBoxCoord = useRef({
@@ -56,15 +89,18 @@ export default function Page() {
     left: 0,
   });
 
+  const [content, setContent] = useState<string | ReactNode>("");
   const [mentioned, setMentioned] = useState(false);
-  const handleChange = (event: SyntheticEvent) => {
-    const textarea = event.target as HTMLTextAreaElement;
-    const userInput: string = textarea.value;
+  const handleInput = (event: SyntheticEvent) => {
+    const contentEditable = event.target as HTMLDivElement;
+    const userInput = contentEditable.innerText;
 
-    mentionBoxCoord.current.left = textarea.offsetLeft + 200;
-    mentionBoxCoord.current.top = textarea.offsetTop;
+    setContent(userInput);
+    moveCursorToEndContenteditable(contentEditable);
 
     if (userInput[userInput.length - 1] === "@") {
+      mentionBoxCoord.current.left = contentEditable.offsetLeft + 400;
+      mentionBoxCoord.current.top = contentEditable.offsetTop;
       return setMentioned(true);
     }
 
@@ -81,34 +117,46 @@ export default function Page() {
         {isLoading && "Generating..."}
       </button>
 
-      {isLoading && people.length === 0 && (
+      {(isLoading || !people) && (
         <div className="bg-white rounded-lg p-2 mt-3">
           <p>Please wait...</p>
         </div>
       )}
-      {!(people.length > 0) && (
-        <div className="bg-white rounded-lg p-2 mt-3">
-          {people.map((person, index) => (
-            <p key={index}>
-              {index + 1}. {JSON.stringify(person)}
-            </p>
-          ))}
+      {people && (
+        <div className="bg-white rounded-lg p-2 mt-3 hidden">
+          {Object.keys(people).map((key) =>
+            people[key].map((person: string, index: number) => (
+              <p key={index}>
+                {index + 1}. <b>{key}</b> {person}
+              </p>
+            ))
+          )}
         </div>
       )}
 
       <div className="mt-6">
-        <textarea
-          id="textarea"
-          onChange={handleChange}
-          className="border-black border-2 p-3 mt-2 rounded-lg bg-white resize-none"
-          placeholder="Type @ to mention"
-          cols={20}
-          rows={10}
-        ></textarea>
+        <div
+          id="content_editable"
+          contentEditable={true}
+          onInput={handleInput}
+          className="border-black border-2 p-3 m-auto mt-2 rounded-lg bg-white w-[400px] h-[500px] text-left"
+        >
+          {content}
+        </div>
 
-        {mentioned && (
-          <MentionBox coord={mentionBoxCoord.current} people={people} />
-        )}
+        <MentionBox
+          coord={mentionBoxCoord.current}
+          people={people}
+          opened={mentioned}
+          toggle={() => {
+            setMentioned(false);
+            const contentEditableElement =
+              document.querySelector<HTMLDivElement>("#content_editable")!;
+
+            contentEditableElement!.focus();
+            moveCursorToEndContenteditable(contentEditableElement);
+          }}
+        />
       </div>
     </div>
   );

@@ -3,7 +3,11 @@ type Props = {
     top: number;
     left: number;
   };
-  people: string[];
+  people: {
+    // employee: string[];
+    // customer: string[];
+    [key: string]: string[];
+  };
   opened: boolean;
   toggle: () => void;
 };
@@ -19,22 +23,25 @@ export default function MentionBox({ coord, people, opened, toggle }: Props) {
         left: coord.left,
       }}
     >
-      {people.map((person) => (
-        <div
-          className="p-1 hover:bg-orange-50 border-2 border-slate-200 cursor-pointer text-left"
-          onClick={toggle}
-        >
-          <p
-            className="overflow-ellipsis"
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-            }}
+      {Object.keys(people).map((key, index) =>
+        people[key].map((person: string, index: number) => (
+          <div
+            key={index}
+            className="p-1 hover:bg-orange-50 border-2 border-slate-200 cursor-pointer text-left"
+            onClick={toggle}
           >
-            {person}
-          </p>
-        </div>
-      ))}
+            <p
+              className="overflow-ellipsis"
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+              }}
+            >
+              {person}
+            </p>
+          </div>
+        ))
+      )}
     </div>
   );
 }
