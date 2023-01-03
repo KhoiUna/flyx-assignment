@@ -122,6 +122,16 @@ export default function Page() {
 
   return (
     <div className="text-center p-5 bg-slate-50 min-h-screen">
+      <a
+        href="https://github.com/KhoiUna/flyx-assignment"
+        target="_blank"
+        rel="noreferrer"
+      >
+        <p className="text-right text-lg text-blue-700 underline font-bold">
+          Source code
+        </p>
+      </a>
+
       <h1 className="text-lg font-bold text-center mb-3">
         1. Hit Generate to have OpenAI-generated names
       </h1>
